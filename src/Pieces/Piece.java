@@ -7,10 +7,29 @@ import game.*;
  */
 public abstract class Piece {
     
-    protected int row, col;
+    /**
+     * Row of the board that this piece occupies.
+     */
+    protected int row; 
 
+    /**
+     * Column of the board that this piece occupies.
+     */
+    protected int col;
+
+    /**
+     * Color or team of this piece.
+     */
     protected Color color;
 
+    /**
+     * The Board object that this chess piece is on.
+     */
+    protected Space[][] board;
+
+    /**
+     * The type of this chess piece.
+     */
     protected PieceType type;
 
     /**
@@ -21,8 +40,11 @@ public abstract class Piece {
      * @param col column piece occupies on board
      * @param color black or white
      */
-    public Piece(int row, int col, Color color) {
-
+    public Piece(int row, int col, Color color, Board board) {
+        this.row = row;
+        this.col = col;
+        this.color = color;
+        this.board = board.board;
     }
 
     /**
@@ -32,12 +54,22 @@ public abstract class Piece {
      * @param newCol
      */
     public void move(int newRow, int newCol) {
+        if (isLegalMove(newRow, newCol)) {
+            Piece temp = this;
 
+            // Replace old space with null
+            board[temp.getRow()][temp.getCol()].setPiece(null);
+
+            // Fill new space with old piece
+            temp.setRow(newRow);
+            temp.setCol(newCol);
+            board[newRow][newCol].setPiece(temp);
+        }
     }
 
     @Override
     public String toString() {
-        return "[row=" + row + ", col=" + col + ", type=" + type.toString() + "]";
+        return "[row=" + row + ", col=" + col + ", type=" + getType().toString() + "]";
     }
 
 
@@ -50,6 +82,13 @@ public abstract class Piece {
      * @return true if a legal move, false otherwise
      */
     public abstract boolean isLegalMove(int newRow, int newCol);
+
+    /**
+     * Gets the type of the piece.
+     * 
+     * @return type of the piece
+     */
+    public abstract PieceType getType();
 
     // --------------------------------------- Accessor and Mutator Methods ---------------------------------------
 
@@ -69,15 +108,6 @@ public abstract class Piece {
      */
     public int getCol() {
         return col;
-    }
-
-    /**
-     * Gets the piece type of this piece.
-     * 
-     * @return type
-     */
-    public PieceType getType() {
-        return type;
     }
 
     /**

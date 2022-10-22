@@ -8,28 +8,30 @@ import pieces.Piece;
  */
 public class Space {
     
-    private int row, col;
+    private final int row;
+
+    private final int col;
 
     private Piece piece = null;
 
     /**
-     * Creates a new space on a chess board at the
-     * specified row and column without a piece.
+     * Creates a new empty space on chess board at 
+     * the specifieed row and column.
      * 
-     * @param row row on board
-     * @param col colun on board
+     * @param row 
+     * @param col
      */
     public Space(int row, int col) {
         this.row = row;
         this.col = col;
     }
-
+    
     /**
      * Creates a new space on chess board at the
      * specified row and column with a chess piece.
      * 
-     * @param row row on board
-     * @param col column on board
+     * @param row
+     * @param col
      * @param piece chess piece occupying space
      */
     public Space(int row, int col, Piece piece) {
@@ -42,8 +44,12 @@ public class Space {
      * 
      * @return piece
      */
-    public Piece getPiece() {
+    public Piece getPiece() throws NullPointerException {
         return piece;
+    }
+
+    public void setPiece(Piece p) {
+        piece = p;
     }
 
     
