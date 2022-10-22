@@ -35,6 +35,11 @@ public abstract class Piece {
 
     }
 
+    @Override
+    public String toString() {
+        return "[row=" + row + ", col=" + col + ", type=" + type.toString() + "]";
+    }
+
 
     /**
      * Determines if the move at the new space is legal

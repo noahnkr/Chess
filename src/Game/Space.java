@@ -37,4 +37,14 @@ public class Space {
         this.piece = piece;
     }
 
+    /**
+     * Gets piece occupying this space.
+     * 
+     * @return piece
+     */
+    public Piece getPiece() {
+        return piece;
+    }
+
+    
 }
