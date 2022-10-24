@@ -67,6 +67,36 @@ public abstract class Piece {
         }
     }
 
+    /**
+     * Helper method for isLegalMove which determines if the
+     * desired space is on the board.
+     * 
+     * @param newRow
+     * @param newCol
+     * @return true if on board, false otherwise
+     */
+    protected boolean onBoard(int newRow, int newCol) {
+        if ((newRow < 0 || newRow > 7) || (newCol < 0 || newCol >= 7))
+            return false;
+        return true;
+    }
+
+    /**
+     * Helper method for isLegalMove which determines if the
+     * desired space is occupied by either an empty space, or an enemy.
+     * @param newRow
+     * @param newCol
+     * @return true if empty or enemy, false otherwise
+     */
+    protected boolean isOpenSpace(int newRow, int newCol) {
+        if (board[newRow][newCol].getPiece() == null) 
+            return true;
+        else if ((board[newRow][newCol].getPiece().getColor() == Color.WHITE && color == Color.BLACK) ||
+                (board[newRow][newCol].getPiece().getColor() == Color.BLACK && color == Color.WHITE)) 
+            return true;
+        return false;
+    }
+
     @Override
     public String toString() {
         return "[row=" + row + ", col=" + col + ", type=" + getType().toString() + "]";

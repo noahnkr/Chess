@@ -2,6 +2,8 @@ package game;
 
 import pieces.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import exceptions.IllegalLayoutException;
 
 /**
@@ -27,17 +29,80 @@ public class Board {
     /**
      * Constructs a new chess board with a custom layout
      * specified in the input file. Format for the file is as follows:
+     * 
      * K - King
      * Q - Queen
      * R - Rook
      * B - Bishop
      * N - Knight
      * P - Pawn
+     * . - Empty Space
+     * 
+     * 0 - White
+     * 1 - Black
      * 
      * @param inputFile an input file which specifies layout of chess board.
      */
-    public Board(File inputFile) throws IllegalLayoutException {
+    public Board(File inputFile) throws IllegalLayoutException, FileNotFoundException {
+        // TODO: Fix this...
         board = new Space[BOARD_SIZE][BOARD_SIZE];
+        Scanner boardScanner = new Scanner(inputFile);
+
+        int curRow = 0;
+        int curCol = 0;
+        while (boardScanner.hasNextLine()) {
+            while (boardScanner.hasNext()) {
+                String spaceStr = boardScanner.next();
+                char pieceType = spaceStr.charAt(0);
+                char color = spaceStr.charAt(1);
+                Color team = null;
+                
+                if(spaceStr.length() == 2) {
+                    if (color == '0')
+                        team = Color.WHITE;
+                    else if(color == '1')
+                        team = Color.BLACK;
+                    else
+                        throw new IllegalLayoutException("Unknown color character");
+                }
+                    
+                    switch (pieceType) {
+                        case 'K':
+                            board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, team, this));
+                            break;
+                        case 'Q':
+                            board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, team, this));
+                            break;
+                        case 'R':
+                            board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, team, this));
+                            break;
+                        case 'B':
+                            board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, team, this));
+                            break;
+                        case 'N':
+                            board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, team, this));
+                            break;
+                        case 'P':
+                            board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, team, this));
+                            break;
+                        case '.':
+                            board[curRow][curCol] = new Space(curRow, curCol);
+                            break;
+                        default:
+                            throw new IllegalLayoutException("Unknown space character");
+                    }
+                    curCol++;
+                }
+                if (curCol != 7)
+                    throw new IllegalLayoutException("Missing space character at [" + curRow + ", " + curCol + "]");
+                else if (boardScanner.hasNextLine()) {
+                    boardScanner.nextLine();
+                    curCol = 0;
+                }  
+            }
+
+        if(curRow != 7)
+            throw new IllegalLayoutException("Not enough rows in input file.");
     }
 
     /**
@@ -116,7 +181,7 @@ public class Board {
                             ret += "P ";
                             break;
                     }
-                }   catch(NullPointerException e) {
+                } catch(NullPointerException e) {
                     ret += "· ";
                 }
             }

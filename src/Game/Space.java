@@ -52,5 +52,4 @@ public class Space {
         piece = p;
     }
 
-    
 }
