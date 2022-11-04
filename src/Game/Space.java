@@ -14,6 +14,8 @@ public class Space {
 
     private Piece piece = null;
 
+    public String key;
+
     /**
      * Creates a new empty space on chess board at 
      * the specifieed row and column.
@@ -50,6 +52,10 @@ public class Space {
 
     public void setPiece(Piece p) {
         piece = p;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
 }

@@ -14,9 +14,7 @@ public class Chess {
     public static void main(String[] args) throws FileNotFoundException, IllegalLayoutException {
         File inputFile = new File("src\\tests\\TestFile1.txt");
         Board b = new Board();
-        System.out.println(b.board[1][1].getPiece().isLegalMove(1, 2));
-
-        
+        System.out.println(b.getSpaceFromKey("a8"));
         
     }
     

@@ -3,18 +3,23 @@ package game;
 import pieces.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 import exceptions.IllegalLayoutException;
 
 /**
  * A chess board which simulates a game of chess.
+ * 
  * @author Noah Roberts
  */
 public class Board {
-    
+
     private static final int BOARD_SIZE = 8;
-    
+
     public Space[][] board;
+
+    public HashMap<String, Space> coordinates;
+
 
     /**
      * Constructs a new chess board with the standard starting
@@ -23,8 +28,9 @@ public class Board {
     public Board() {
         board = new Space[BOARD_SIZE][BOARD_SIZE];
         setDefaultBoard();
+        labelSpaces();
+        initializeHashMap();
     }
-
 
     /**
      * Constructs a new chess board with a custom layout
@@ -56,53 +62,56 @@ public class Board {
                 char pieceType = spaceStr.charAt(0);
                 char color = spaceStr.charAt(1);
                 Color team = null;
-                
-                if(spaceStr.length() == 2) {
+
+                if (spaceStr.length() == 2) {
                     if (color == '0')
                         team = Color.WHITE;
-                    else if(color == '1')
+                    else if (color == '1')
                         team = Color.BLACK;
                     else
                         throw new IllegalLayoutException("Unknown color character");
                 }
-                    
-                    switch (pieceType) {
-                        case 'K':
-                            board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, team, this));
-                            break;
-                        case 'Q':
-                            board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, team, this));
-                            break;
-                        case 'R':
-                            board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, team, this));
-                            break;
-                        case 'B':
-                            board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, team, this));
-                            break;
-                        case 'N':
-                            board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, team, this));
-                            break;
-                        case 'P':
-                            board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, team, this));
-                            break;
-                        case '.':
-                            board[curRow][curCol] = new Space(curRow, curCol);
-                            break;
-                        default:
-                            throw new IllegalLayoutException("Unknown space character");
-                    }
-                    curCol++;
-                }
-                if (curCol != 7)
-                    throw new IllegalLayoutException("Missing space character at [" + curRow + ", " + curCol + "]");
-                else if (boardScanner.hasNextLine()) {
-                    boardScanner.nextLine();
-                    curCol = 0;
-                }  
-            }
 
-        if(curRow != 7)
+                switch (pieceType) {
+                    case 'K':
+                        board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, team, this));
+                        break;
+                    case 'Q':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, team, this));
+                        break;
+                    case 'R':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, team, this));
+                        break;
+                    case 'B':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, team, this));
+                        break;
+                    case 'N':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, team, this));
+                        break;
+                    case 'P':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, team, this));
+                        break;
+                    case '.':
+                        board[curRow][curCol] = new Space(curRow, curCol);
+                        break;
+                    default:
+                        throw new IllegalLayoutException("Unknown space character");
+                }
+                curCol++;
+            }
+            if (curCol != 7)
+                throw new IllegalLayoutException("Missing space character at [" + curRow + ", " + curCol + "]");
+            else if (boardScanner.hasNextLine()) {
+                boardScanner.nextLine();
+                curCol = 0;
+            }
+        }
+
+        if (curRow != 7)
             throw new IllegalLayoutException("Not enough rows in input file.");
+
+        labelSpaces();
+        initializeHashMap();
     }
 
     /**
@@ -154,41 +163,115 @@ public class Board {
         board[7][7] = new Space(7, 7, new Rook(7, 7, Color.WHITE, this));
     }
 
+    private void labelSpaces() {
+        int[] rowIndex = {8, 7, 6, 5, 4, 3, 2, 1};
+        char[] colIndex = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+        
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                String key = "";
+                key += colIndex[col] + rowIndex[row];
+                board[row][col].setKey(key);
+            }
+
+        }
+    }
+
+    private void initializeHashMap() {
+        coordinates = new HashMap<>();
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                coordinates.put(board[row][col].key, board[row][col]);
+            }
+        }
+    }
+
+    public Space getSpaceFromKey(String key) {
+        return coordinates.get(key);
+    }
+
     @Override
     public String toString() {
         String ret = "";
-        for(int row = 0; row < BOARD_SIZE; row++) {
-            for(int col = 0; col < BOARD_SIZE; col++) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            // Horizontal Border
+            ret += drawHorizontalLine();
+            
+            for (int col = 0; col < BOARD_SIZE; col++) {
                 try {
-                    PieceType type =  board[row][col].getPiece().getType();
-                    switch(type) {
+                    PieceType type = board[row][col].getPiece().getType();
+                    Color color = board[row][col].getPiece().getColor();
+                    switch (type) {
                         case KING:
-                            ret += "K ";
+                            if (color == Color.WHITE)
+                                ret += "| K ";
+                            else
+                                ret += "| k ";
                             break;
                         case QUEEN:
-                            ret += "Q ";
+                            if (color == Color.WHITE)
+                                ret += "| Q ";
+                            else
+                                ret += "| q ";
                             break;
                         case ROOK:
-                            ret += "R ";
+                            if (color == Color.WHITE)
+                                ret += "| R ";
+                            else
+                                ret += "| r ";
                             break;
                         case BISHOP:
-                            ret += "B ";
+                            if (color == Color.WHITE)
+                                ret += "| B ";
+                            else
+                                ret += "| b ";
                             break;
                         case KNIGHT:
-                            ret += "N ";
+                            if (color == Color.WHITE)
+                                ret += "| N ";
+                            else
+                                ret += "| n ";
                             break;
                         case PAWN:
-                            ret += "P ";
+                            if (color == Color.WHITE)
+                                ret += "| P ";
+                            else
+                                ret += "| p ";
                             break;
                     }
-                } catch(NullPointerException e) {
-                    ret += "· ";
+                } catch (NullPointerException e) {
+                    ret += "|   ";
                 }
+
+                if (col == 7)
+                    ret += "| " + (8 - row);
             }
-            if(row != 7)
+            if (row != 7)
                 ret += "\n";
         }
 
+        ret += "\n" + drawHorizontalLine();
+
+        char[] charCols = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+        for (int i = 0; i < charCols.length; i++) {
+            ret += "  " + charCols[i] + " ";
+        }
+        return ret;
+    }
+
+    private String drawHorizontalLine() {
+        String ret = "";
+        for (int i = 0; i < 33; i++) {
+            // +
+            if (i % 4 == 0) {
+                ret += "+";
+                // + at end
+                if (i == 32)
+                    ret +="\n";
+            // -
+            } else
+                ret += "-";
+        }
         return ret;
     }
 
