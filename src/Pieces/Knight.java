@@ -10,14 +10,22 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean isLegalMove(int newRow, int newCol) {
-        // TODO Auto-generated method stub
-        return true;
+    public void getPossibleMoves() {
+        possibleMoves.add(new Move(this, row - 2, col + 1));
+        possibleMoves.add(new Move(this, row - 1, col + 2));
+        possibleMoves.add(new Move(this, row + 1, col + 2));
+        possibleMoves.add(new Move(this, row + 2, col + 1));
+        possibleMoves.add(new Move(this, row + 2, col - 1));
+        possibleMoves.add(new Move(this, row + 1, col - 2));
+        possibleMoves.add(new Move(this, row - 1, col - 2));
+        possibleMoves.add(new Move(this, row - 2, col - 1));
     }
 
     @Override
     public PieceType getType() {
         return type;
     }
+
+
     
 }

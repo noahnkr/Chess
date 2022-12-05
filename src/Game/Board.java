@@ -30,6 +30,7 @@ public class Board {
         setDefaultBoard();
         labelSpaces();
         initializeHashMap();
+        updatePossibleMoves();
     }
 
     /**
@@ -50,58 +51,68 @@ public class Board {
      * @param inputFile an input file which specifies layout of chess board.
      */
     public Board(File inputFile) throws IllegalLayoutException, FileNotFoundException {
-        // TODO: Fix this...
         board = new Space[BOARD_SIZE][BOARD_SIZE];
-        Scanner boardScanner = new Scanner(inputFile);
+        scanFromFile(inputFile);
+        labelSpaces();
+        initializeHashMap();
+        updatePossibleMoves();
+    }
 
+    private void scanFromFile(File inputFile) throws FileNotFoundException, IllegalLayoutException {
+        Scanner boardScanner = new Scanner(inputFile);
         int curRow = 0;
         int curCol = 0;
         while (boardScanner.hasNextLine()) {
             while (boardScanner.hasNext()) {
-                String spaceStr = boardScanner.next();
-                char pieceType = spaceStr.charAt(0);
-                char color = spaceStr.charAt(1);
-                Color team = null;
-
-                if (spaceStr.length() == 2) {
-                    if (color == '0')
-                        team = Color.WHITE;
-                    else if (color == '1')
-                        team = Color.BLACK;
-                    else
-                        throw new IllegalLayoutException("Unknown color character");
-                }
-
+                char pieceType = boardScanner.next().charAt(0);
+                System.out.println(pieceType);
                 switch (pieceType) {
                     case 'K':
-                        board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'k':
+                        board[curRow][curCol] = new Space(curRow, curCol, new King(curRow, curCol, Color.BLACK, this));
                         break;
                     case 'Q':
-                        board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'q':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Queen(curRow, curCol, Color.BLACK, this));
                         break;
                     case 'R':
-                        board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'r':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Rook(curRow, curCol, Color.BLACK, this));
                         break;
                     case 'B':
-                        board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'b':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Bishop(curRow, curCol, Color.BLACK, this));
                         break;
                     case 'N':
-                        board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'n':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Knight(curRow, curCol, Color.BLACK, this));
                         break;
                     case 'P':
-                        board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, team, this));
+                        board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, Color.WHITE, this));
+                        break;
+                    case 'p':
+                        board[curRow][curCol] = new Space(curRow, curCol, new Pawn(curRow, curCol, Color.BLACK, this));
                         break;
                     case '.':
                         board[curRow][curCol] = new Space(curRow, curCol);
                         break;
-                    default:
-                        throw new IllegalLayoutException("Unknown space character");
                 }
                 curCol++;
             }
-            if (curCol != 7)
-                throw new IllegalLayoutException("Missing space character at [" + curRow + ", " + curCol + "]");
-            else if (boardScanner.hasNextLine()) {
+
+            if (curCol != 7) {
+                throw new IllegalLayoutException("Missing columns in input file. curCol=" + curCol);
+            } else if (boardScanner.hasNextLine()) {
                 boardScanner.nextLine();
                 curCol = 0;
             }
@@ -109,10 +120,7 @@ public class Board {
 
         if (curRow != 7)
             throw new IllegalLayoutException("Not enough rows in input file.");
-
-        labelSpaces();
-        initializeHashMap();
-    }
+    } 
 
     /**
      * Gets the 2D array of Spaces of the chess board.
@@ -164,18 +172,19 @@ public class Board {
     }
 
     private void labelSpaces() {
-        int[] rowIndex = {8, 7, 6, 5, 4, 3, 2, 1};
+
         char[] colIndex = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 String key = "";
-                key += colIndex[col] + rowIndex[row];
+                key += colIndex[col] + "" + (8 - row);
                 board[row][col].setKey(key);
             }
 
         }
     }
+
 
     private void initializeHashMap() {
         coordinates = new HashMap<>();
@@ -184,6 +193,20 @@ public class Board {
                 coordinates.put(board[row][col].key, board[row][col]);
             }
         }
+    }
+
+    public void updatePossibleMoves() {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                try {
+                    board[row][col].getPiece().getColor();
+                } catch(NullPointerException e) {
+                    continue;
+                }
+                
+            }
+        }
+
     }
 
     public Space getSpaceFromKey(String key) {

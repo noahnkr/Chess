@@ -10,24 +10,28 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public boolean isLegalMove(int newRow, int newCol) {
-        if (onBoard(newRow, newCol)) {
-            if (withinOneSpace(newRow, newCol) && isOpenSpace(newRow, newCol))
-                return true;
+    public void getPossibleMoves() {
+        if (color == Color.WHITE) {
+            possibleMoves.add(new Move(this, row - 1, col));
+            possibleMoves.add(new Move(this, row - 2, col));
+            possibleMoves.add(new Move(this, row - 1, col - 1));
+            possibleMoves.add(new Move(this, row - 1, col + 1));
+        } else {
+            possibleMoves.add(new Move(this, row + 1, col));
+            possibleMoves.add(new Move(this, row + 2, col));
+            possibleMoves.add(new Move(this, row + 1, col - 1));
+            possibleMoves.add(new Move(this, row + 1, col + 1));
         }
-        return false;
-    }
-
-    public boolean withinOneSpace(int newRow, int newCol) {
-        if (((row - 1) == newRow || row == newRow || (row + 1) == newRow) && 
-            ((col - 1) == newCol || col == newCol || (col + 1) == newCol))
-                return true;
-        return false;
     }
 
     @Override
     public PieceType getType() {
         return type;
     }
+
+
+
+
+    
     
 }

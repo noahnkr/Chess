@@ -8,9 +8,9 @@ import pieces.Piece;
  */
 public class Space {
     
-    private final int row;
+    public final int row;
 
-    private final int col;
+    public final int col;
 
     private Piece piece = null;
 

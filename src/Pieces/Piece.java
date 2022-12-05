@@ -1,5 +1,7 @@
 package pieces;
 
+import java.util.ArrayList;
+
 import game.*;
 
 /**
@@ -25,12 +27,22 @@ public abstract class Piece {
     /**
      * The Board object that this chess piece is on.
      */
-    protected Space[][] board;
+    protected Board board;
 
     /**
      * The type of this chess piece.
      */
     protected PieceType type;
+
+    /**
+     * A list of all the possible moves for this piece.
+     */
+    protected ArrayList<Move> possibleMoves;
+
+    /**
+     * A list of all the legal moves for this piece.
+     */
+    protected ArrayList<Move> legalMoves;
 
     /**
      * Creates a new abstract chess piece which has a position 
@@ -44,7 +56,8 @@ public abstract class Piece {
         this.row = row;
         this.col = col;
         this.color = color;
-        this.board = board.board;
+        this.board = board;
+        possibleMoves = new ArrayList<Move>();
     }
 
     /**
@@ -53,65 +66,49 @@ public abstract class Piece {
      * @param newRow  
      * @param newCol
      */
-    public void move(int newRow, int newCol) {
-        if (isLegalMove(newRow, newCol)) {
+    public void move(Move move) {
+        if (move.isLegal()) {
             Piece temp = this;
+            int newRow = move.getRow();
+            int newCol = move.getCol();
 
             // Replace old space with null
-            board[temp.getRow()][temp.getCol()].setPiece(null);
+            board.board[temp.getRow()][temp.getCol()].setPiece(null);
 
             // Fill new space with old piece
             temp.setRow(newRow);
             temp.setCol(newCol);
-            board[newRow][newCol].setPiece(temp);
+            board.board[newRow][newCol].setPiece(temp);
         }
     }
 
-    /**
-     * Helper method for isLegalMove which determines if the
-     * desired space is on the board.
-     * 
-     * @param newRow
-     * @param newCol
-     * @return true if on board, false otherwise
-     */
-    protected boolean onBoard(int newRow, int newCol) {
-        if ((newRow < 0 || newRow > 7) || (newCol < 0 || newCol >= 7))
-            return false;
-        return true;
+    public void move(String key) {
+        move(new Move(this, board.getSpaceFromKey(key).row, board.getSpaceFromKey(key).col));
     }
 
-    /**
-     * Helper method for isLegalMove which determines if the
-     * desired space is occupied by either an empty space, or an enemy.
-     * @param newRow
-     * @param newCol
-     * @return true if empty or enemy, false otherwise
-     */
-    protected boolean isOpenSpace(int newRow, int newCol) {
-        if (board[newRow][newCol].getPiece() == null) 
-            return true;
-        else if ((board[newRow][newCol].getPiece().getColor() == Color.WHITE && color == Color.BLACK) ||
-                (board[newRow][newCol].getPiece().getColor() == Color.BLACK && color == Color.WHITE)) 
-            return true;
-        return false;
+    public void getMoves() {
+        getPossibleMoves();
+        getLegalMoves();
+    }
+
+    protected void getLegalMoves() {
+        legalMoves = new ArrayList<Move>();
+        for (Move m : possibleMoves) {
+            if (m.isLegal())
+                legalMoves.add(m);
+        }
     }
 
     @Override
     public String toString() {
-        return "[row=" + row + ", col=" + col + ", type=" + getType().toString() + "]";
+        return "[row=" + row + ", col=" + col + ", type=" + getType().toString() + ", color=" + color + "]";
     }
 
-
     /**
-     * Determines if the move at the new space is legal
-     * for the specific piece.
-     * 
-     * @param newRow
-     * @param newCol 
-     * @return true if a legal move, false otherwise
+     * Populates the possibleMoves array with the possible moves 
+     * for a certain piece.
      */
-    public abstract boolean isLegalMove(int newRow, int newCol);
+    protected abstract void getPossibleMoves();
 
     /**
      * Gets the type of the piece.
@@ -147,6 +144,14 @@ public abstract class Piece {
      */
     public Color getColor() {
         return color;
+    }
+
+    /**
+     * Gets the board this piece is on.
+     * @return
+     */
+    public Board getBoard() {
+        return board;
     }
 
     /**

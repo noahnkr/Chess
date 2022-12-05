@@ -10,9 +10,9 @@ public class Queen extends Piece {
     }
 
     @Override
-    public boolean isLegalMove(int newRow, int newCol) {
+    public void getPossibleMoves() {
         // TODO Auto-generated method stub
-        return true;
+        
     }
 
     @Override

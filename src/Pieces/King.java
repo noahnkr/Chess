@@ -1,6 +1,6 @@
 package pieces;
 
-import javax.swing.plaf.TreeUI;
+import java.util.ArrayList;
 
 import game.*;
 
@@ -11,34 +11,28 @@ public class King extends Piece {
     public King(int row, int col, Color color, Board board) {
         super(row, col, color, board);
         type = PieceType.KING;
+        possibleMoves = new ArrayList<Move>();
         inCheck = false;
     }
 
     @Override
-    public boolean isLegalMove(int newRow, int newCol) {
-        if (onBoard(newRow, newCol)) {
-            if (withinOneSpace(newRow, newCol) && isOpenSpace(newRow, newCol) &&
-                wontBeInCheck(newRow, newCol))
-                    return true;
-        }
-        return false;
+    public void getPossibleMoves() {
+        possibleMoves.add(new Move(this, row - 1, col - 1));
+        possibleMoves.add(new Move(this, row - 1, col));
+        possibleMoves.add(new Move(this, row - 1, col + 1));
+        possibleMoves.add(new Move(this, row, col - 1));
+        possibleMoves.add(new Move(this, row - 1, col + 1));
+        possibleMoves.add(new Move(this, row + 1, col - 1));
+        possibleMoves.add(new Move(this, row + 1, col));
+        possibleMoves.add(new Move(this, row + 1, col + 1));
     }
 
-    public boolean withinOneSpace(int newRow, int newCol) {
-        if (((row - 1) == newRow || row == newRow || (row + 1) == newRow) && 
-            ((col - 1) == newCol || col == newCol || (col + 1) == newCol))
-                return true;
-        return false;
-    }
-
-    private boolean wontBeInCheck(int newRow, int newCol) {
-        // TODO: 
-        return true;
-    }
 
     @Override
     public PieceType getType() {
         return type;
     }
+
+    
     
 }

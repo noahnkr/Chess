@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import exceptions.IllegalLayoutException;
-import pieces.Pawn;
+import pieces.*;
 
 /**
  * Simulates a game of chess played between two players.
@@ -12,9 +12,13 @@ import pieces.Pawn;
 public class Chess {
 
     public static void main(String[] args) throws FileNotFoundException, IllegalLayoutException {
-        File inputFile = new File("src\\tests\\TestFile1.txt");
         Board b = new Board();
-        System.out.println(b.getSpaceFromKey("a8"));
+        System.out.println(b.toString());
+        Piece p = b.getSpaceFromKey("b1").getPiece();
+        p.move(new Move(p, b.getSpaceFromKey("b1")));
+        System.out.println(b.toString());
+        
+
         
     }
     

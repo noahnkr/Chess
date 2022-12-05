@@ -1,5 +1,6 @@
 package pieces;
 
+
 import game.*;
 
 public class Bishop extends Piece {
@@ -10,14 +11,23 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public boolean isLegalMove(int newRow, int newCol) {
-        // TODO Auto-generated method stub
-        return true;
+    public void getPossibleMoves() {
+        for (int i = 0; i < 8; i++) {
+            possibleMoves.add(new Move(this, row + i, col + i));
+            possibleMoves.add(new Move(this, row + i, col + i));
+
+
+        }
+        
     }
+
 
     @Override
     public PieceType getType() {
         return type;
     }
+
+
+    
     
 }
